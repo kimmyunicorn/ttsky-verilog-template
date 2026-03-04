@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Your Name
+ * Copyright (c) 2026 Kimberly Camanero
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,12 +16,23 @@ module tt_um_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
+wire [3:0] sum;
+wire carry_out;
+
+full_add kimmys_adder(
+  .a_i (ui_in[3:0]),
+  .b_i (ui_in[3:0]),
+  .carry_i (ui_in[4]),
+  .sum_o (sum),
+  .carry_o (carry_out)
+);
+
   // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
+  assign uo_out  = {3'b0, carry_out, sum};  // bits [4:0] = carry + sum
   assign uio_out = 0;
   assign uio_oe  = 0;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+  wire _unused = &{ena, clk, rst_n, ui_in[7:5], uio_in[7:4], 1'b0};
 
 endmodule
