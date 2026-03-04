@@ -1,8 +1,8 @@
 module full_add (
     input logic [3:0] a_i,
     input logic [3:0] b_i,
-    input logic [3:0] carry_i,
-    output logic [0:0] carry_o,
+    input logic carry_i,
+    output logic carry_o,
     output logic [3:0] sum_o
     );
 
@@ -13,5 +13,7 @@ module full_add (
         sum_o = result[3:0];
         carry_o = result[4];
     end
+
+    
 
 endmodule

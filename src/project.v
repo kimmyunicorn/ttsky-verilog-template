@@ -21,7 +21,7 @@ wire carry_out;
 
 full_add kimmys_adder(
   .a_i (ui_in[3:0]),
-  .b_i (ui_in[3:0]),
+  .b_i (uio_in[3:0]),
   .carry_i (ui_in[4]),
   .sum_o (sum),
   .carry_o (carry_out)
