@@ -23,18 +23,34 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
+    dut._log.info("Test 4-bit adder")
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    #Test cases: (a, b, carry_in) -> expected (carry_out, sum)
+    tests = [
+        (0,0,0), #0+0+0 = 0
+        (1,1,0), #1+1+0 = 2
+        (7,8,0), #7+8+0 = 15
+        (15,15,0) #15+15+0 = 30 (carry_out =1, sum = 14)
+        (15,15,1) #15+15+1 = 31 (carry_out=1, sume=15)
+        (5,3,1) #5+3+1 = 9
+        (0,0,1) # 0+0+1 = 1
+        (8,7,1) #8+7+1 = 16 (carry_out = 1, sume = 0)
+    ]
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    for (a,b,cin) in tests:
+        #a on ui_in[3:0], carry_in on ui_in[4], b on uio_in[3:0
+        dut.ui_in.value = a| (cin <<4)
+        dut.uio_in.value = b
+        await ClockCycle(dut.clk, 1)
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+        total a + b + cin
+        exp_sum = total & 0xF #lower 4 bits
+        exp_cout = (total >> 4) & 1
+        expected = (exp_cout << 4) | exp_sum
+        
+        assert dut.uo_out.value == expected, \
+            f"FAIL: a={a} b={b} cin={cin} => got {int(dut.uo_out.value)}, expected {expected}"
+        dut._log.info(f"PASS: a={a} b={b} cin={cin} = {total} (cout = {exp_count} sum ={exp_sum})")
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+    dut._log.info("All tests passed")
+        
